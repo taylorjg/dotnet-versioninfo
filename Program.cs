@@ -14,10 +14,10 @@ namespace dotnet_versioninfo
 
         private void ProcessFile(string fileName)
         {
-            var vi = FileVersionInfo.GetVersionInfo(fileName);
+            var fvi = FileVersionInfo.GetVersionInfo(fileName);
             Console.WriteLine($"{fileName}");
-            Console.WriteLine($"\tFileVersion:\t{vi.FileVersion}");
-            Console.WriteLine($"\tProductVersion:\t{vi.ProductVersion}");
+            Console.WriteLine($"\tFileVersion:\t{fvi.FileVersion}");
+            Console.WriteLine($"\tProductVersion:\t{fvi.ProductVersion}");
         }
 
         private int OnExecute()
