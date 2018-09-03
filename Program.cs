@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
 using System.IO;
@@ -7,10 +8,16 @@ using Glob;
 
 namespace dotnet_versioninfo
 {
-    [Command(Description = "Display version information of .NET Core assemblies")]
+    [Command(
+        Name = "dotnet versioninfo",
+        FullName = "dotnet-versioninfo",
+        Description = "Display version information of .NET Core assemblies.")]
     class Program
     {
         public static int Main(string[] args) => CommandLineApplication.Execute<Program>(args);
+
+        [Option(Description = "Display the version of this tool and then exit")]
+        public bool Version { get; }
 
         private void ProcessFile(string fileName)
         {
@@ -25,8 +32,20 @@ namespace dotnet_versioninfo
 
         private T Identity<T>(T t) => t;
 
+        private static void DisplayVersion()
+        {
+            var assembly = Assembly.GetEntryAssembly();
+            var aiva = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            Console.WriteLine($"{aiva.InformationalVersion}");
+        }
+
         private int OnExecute()
         {
+            if (Version) {
+                DisplayVersion();
+                return 0;
+            }
+
             var baseDir = ".";
             var pattern = "**/*.dll";
             var absoluteBaseDir = Path.GetFullPath(baseDir);
