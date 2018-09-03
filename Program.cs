@@ -20,11 +20,26 @@ namespace dotnet_versioninfo
             Console.WriteLine($"\tProductVersion:\t{fvi.ProductVersion}");
         }
 
+        private Func<string, string> ToRelativePath(string relativeTo) =>
+            (string path) => Path.GetRelativePath(relativeTo, path);
+
+        private T Identity<T>(T t) => t;
+
         private int OnExecute()
         {
-            var root = new DirectoryInfo(".");
-            var allDllFiles = root.GlobFiles("**/*.dll").ToList();
-            allDllFiles.ForEach(fileInfo => ProcessFile(fileInfo.FullName));
+            var baseDir = ".";
+            var pattern = "**/*.dll";
+            var absoluteBaseDir = Path.GetFullPath(baseDir);
+            var useRelativePaths = true;
+            var pathTransformer = useRelativePaths
+                ? ToRelativePath(absoluteBaseDir)
+                : Identity;
+            var directoryInfo = new DirectoryInfo(absoluteBaseDir);
+            var fileNames = directoryInfo.GlobFiles(pattern)
+                .Select(fileInfo => fileInfo.FullName)
+                .Select(pathTransformer)
+                .ToList();
+            fileNames.ForEach(ProcessFile);
             return 0;
         }
     }
