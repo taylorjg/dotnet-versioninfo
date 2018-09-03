@@ -3,7 +3,7 @@ In the meantime, the tool can be installed like this:
 
 ```
 dotnet pack --output .
-dotnet tool install -g dotnet-versioninfo --add-source .
+dotnet tool install --global dotnet-versioninfo --add-source .
 ```
 
 Then it can be used as follows.

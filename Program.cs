@@ -19,6 +19,9 @@ namespace dotnet_versioninfo
         [Option(Description = "Display the version of this tool and then exit")]
         public bool Version { get; }
 
+        [Option(Description = "Show relative paths in the results")]
+        public bool Relative { get; }
+
         private void ProcessFile(string fileName)
         {
             var fvi = FileVersionInfo.GetVersionInfo(fileName);
@@ -49,8 +52,7 @@ namespace dotnet_versioninfo
             var baseDir = ".";
             var pattern = "**/*.dll";
             var absoluteBaseDir = Path.GetFullPath(baseDir);
-            var useRelativePaths = true;
-            var pathTransformer = useRelativePaths
+            var pathTransformer = Relative
                 ? ToRelativePath(absoluteBaseDir)
                 : Identity;
             var directoryInfo = new DirectoryInfo(absoluteBaseDir);
