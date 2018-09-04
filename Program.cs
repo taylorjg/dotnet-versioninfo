@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
 using System.IO;
-using Glob;
+using Ganss.IO;
 using Newtonsoft.Json;
 
 namespace dotnet_versioninfo
@@ -23,22 +23,17 @@ namespace dotnet_versioninfo
         Description = "Display version information of .NET Core assemblies.")]
     class Program
     {
-        private const string DEFAULT_BASE_DIR = ".";
         private const string DEFAULT_PATTERN = "**/*.dll";
 
         public static int Main(string[] args) => CommandLineApplication.Execute<Program>(args);
 
-        [Option(Description = "Base directory to which the glob pattern is applied [current directory]")]
-        [DirectoryExists]
-        public string BaseDir { get; }
-
-        [Option(Description = "Glob pattern [**/*.dll]")]
+        [Argument(0, Description = "Glob pattern [default: **/*.dll]")]
         public string Pattern { get; }
 
-        [Option(Description = "Show relative paths in the results [false]")]
+        [Option(Description = "Show relative paths in the results")]
         public bool Relative { get; }
 
-        [Option(Description = "Format the results as JSON [false]")]
+        [Option(Description = "Format the results as JSON")]
         public bool Json { get; }
 
         [Option(Description = "Display the version of this tool and then exit")]
@@ -66,12 +61,6 @@ namespace dotnet_versioninfo
             Console.WriteLine($"{aiva.InformationalVersion}");
         }
 
-        private static IEnumerable<FileInfo> GlobFilesWorkaround(DirectoryInfo di, string pattern) {
-            var glob = new Glob.Glob(pattern, GlobOptions.Compiled);
-            return di.EnumerateFiles("*", SearchOption.TopDirectoryOnly)
-                .Where(fileInfo => glob.IsMatch(fileInfo.FullName));
-        }
-
         private static void WritePlainTextResults(List<Result> results)
         {
             results.ForEach(result => {
@@ -94,18 +83,12 @@ namespace dotnet_versioninfo
                 return 0;
             }
 
-            var baseDir = BaseDir ?? DEFAULT_BASE_DIR;
             var pattern = Pattern ?? DEFAULT_PATTERN;
-
-            var absoluteBaseDir = Path.GetFullPath(baseDir);
+            var absoluteBaseDir = Path.GetFullPath(".");
             var pathTransformer = Relative
-                ? ToRelativePath(baseDir, absoluteBaseDir)
+                ? ToRelativePath(".", absoluteBaseDir)
                 : Identity;
-            var directoryInfo = new DirectoryInfo(absoluteBaseDir);
-            var fileInfos = pattern.Contains("**")
-                ? directoryInfo.GlobFiles(pattern)
-                : GlobFilesWorkaround(directoryInfo, pattern);
-            var results = fileInfos
+            var results = Glob.Expand(pattern)
                 .Select(fileInfo => fileInfo.FullName)
                 .Select(pathTransformer)
                 .Select(ProcessFile)

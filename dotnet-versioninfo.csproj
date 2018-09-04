@@ -5,13 +5,12 @@
     <PackAsTool>True</PackAsTool>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <Version>0.0.7</Version>
+    <Version>0.0.8</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="glob" Version="0.4.0" />
+    <PackageReference Include="Glob.cs" Version="2.0.13" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.3" />
-    <PackageReference Include="McMaster.NETCore.Plugins" Version="0.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
