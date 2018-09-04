@@ -6,9 +6,17 @@ using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
 using System.IO;
 using Glob;
+using Newtonsoft.Json;
 
 namespace dotnet_versioninfo
 {
+    class Result
+    {
+        public string FileName { get; set; }
+        public string FileVersion { get; set; }
+        public string ProductVersion { get; set; }
+    }
+
     [Command(
         Name = "dotnet versioninfo",
         FullName = "dotnet-versioninfo",
@@ -30,15 +38,20 @@ namespace dotnet_versioninfo
         [Option(Description = "Show relative paths in the results [false]")]
         public bool Relative { get; }
 
+        [Option(Description = "Format the results as JSON [false]")]
+        public bool Json { get; }
+
         [Option(Description = "Display the version of this tool and then exit")]
         public bool Version { get; }
 
-        private void ProcessFile(string fileName)
+        private Result ProcessFile(string fileName)
         {
-            Console.WriteLine($"{fileName}");
             var fvi = FileVersionInfo.GetVersionInfo(fileName);
-            Console.WriteLine($"\tFileVersion:\t{fvi.FileVersion}");
-            Console.WriteLine($"\tProductVersion:\t{fvi.ProductVersion}");
+            return new Result {
+                FileName = fileName,
+                FileVersion = fvi.FileVersion,
+                ProductVersion = fvi.ProductVersion
+            };
         }
 
         private Func<string, string> ToRelativePath(string relativeBaseDir, string absoluteBaseDir) =>
@@ -56,7 +69,22 @@ namespace dotnet_versioninfo
         private static IEnumerable<FileInfo> GlobFilesWorkaround(DirectoryInfo di, string pattern) {
             var glob = new Glob.Glob(pattern, GlobOptions.Compiled);
             return di.EnumerateFiles("*", SearchOption.TopDirectoryOnly)
-                .Where(directory => glob.IsMatch(directory.FullName));
+                .Where(fileInfo => glob.IsMatch(fileInfo.FullName));
+        }
+
+        private static void WritePlainTextResults(List<Result> results)
+        {
+            results.ForEach(result => {
+                Console.WriteLine($"{result.FileName}");
+                Console.WriteLine($"\tFileVersionInfo.FileVersion:\t{result.FileVersion}");
+                Console.WriteLine($"\tFileVersionInfo.ProductVersion:\t{result.ProductVersion}");
+            });
+        }
+
+        private static void WriteJsonResults(List<Result> results)
+        {
+            var jsonString = JsonConvert.SerializeObject(results, Formatting.Indented);
+            Console.WriteLine(jsonString);
         }
 
         private int OnExecute()
@@ -74,16 +102,20 @@ namespace dotnet_versioninfo
                 ? ToRelativePath(actualBaseDir, absoluteBaseDir)
                 : Identity;
             var directoryInfo = new DirectoryInfo(absoluteBaseDir);
-            var fileNames = actualPattern.Contains("**")
+            var fileInfos = actualPattern.Contains("**")
                 ? directoryInfo.GlobFiles(actualPattern)
-                    .Select(fileInfo => fileInfo.FullName)
-                    .Select(pathTransformer)
-                    .ToList()
-                : GlobFilesWorkaround(directoryInfo, actualPattern)
-                    .Select(fileInfo => fileInfo.FullName)
-                    .Select(pathTransformer)
-                    .ToList();
-            fileNames.ForEach(ProcessFile);
+                : GlobFilesWorkaround(directoryInfo, actualPattern);
+            var results = fileInfos
+                .Select(fileInfo => fileInfo.FullName)
+                .Select(pathTransformer)
+                .Select(ProcessFile)
+                .ToList();
+
+            if (Json)
+                WriteJsonResults(results);
+            else
+                WritePlainTextResults(results);
+
             return 0;
         }
     }
