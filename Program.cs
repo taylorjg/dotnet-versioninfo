@@ -94,17 +94,17 @@ namespace dotnet_versioninfo
                 return 0;
             }
 
-            var actualBaseDir = BaseDir ?? DEFAULT_BASE_DIR;
-            var actualPattern = Pattern ?? DEFAULT_PATTERN;
+            var baseDir = BaseDir ?? DEFAULT_BASE_DIR;
+            var pattern = Pattern ?? DEFAULT_PATTERN;
 
-            var absoluteBaseDir = Path.GetFullPath(actualBaseDir);
+            var absoluteBaseDir = Path.GetFullPath(baseDir);
             var pathTransformer = Relative
-                ? ToRelativePath(actualBaseDir, absoluteBaseDir)
+                ? ToRelativePath(baseDir, absoluteBaseDir)
                 : Identity;
             var directoryInfo = new DirectoryInfo(absoluteBaseDir);
-            var fileInfos = actualPattern.Contains("**")
-                ? directoryInfo.GlobFiles(actualPattern)
-                : GlobFilesWorkaround(directoryInfo, actualPattern);
+            var fileInfos = pattern.Contains("**")
+                ? directoryInfo.GlobFiles(pattern)
+                : GlobFilesWorkaround(directoryInfo, pattern);
             var results = fileInfos
                 .Select(fileInfo => fileInfo.FullName)
                 .Select(pathTransformer)
