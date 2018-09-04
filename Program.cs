@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Collections.Generic;
+using System.IO.Abstractions;
 using System.Linq;
 using McMaster.Extensions.CommandLineUtils;
 using System.IO;
@@ -10,11 +11,24 @@ using Newtonsoft.Json;
 
 namespace dotnet_versioninfo
 {
-    class Result
+    abstract class Result
     {
+        [JsonProperty(Order = 1)]
         public string FileName { get; set; }
+    }
+
+    class SuccessResult : Result
+    {
+        [JsonProperty(Order = 2)]
         public string FileVersion { get; set; }
+        [JsonProperty(Order = 3)]
         public string ProductVersion { get; set; }
+    }
+
+    class FailureResult : Result
+    {
+        [JsonProperty(Order = 2)]
+        public string Error { get; set; }
     }
 
     [Command(
@@ -41,16 +55,24 @@ namespace dotnet_versioninfo
 
         private Result ProcessFile(string fileName)
         {
-            var fvi = FileVersionInfo.GetVersionInfo(fileName);
-            return new Result {
-                FileName = fileName,
-                FileVersion = fvi.FileVersion,
-                ProductVersion = fvi.ProductVersion
-            };
+            try {
+                var fvi = FileVersionInfo.GetVersionInfo(fileName);
+                return new SuccessResult {
+                    FileName = fileName,
+                    FileVersion = fvi.FileVersion,
+                    ProductVersion = fvi.ProductVersion
+                };
+            }
+            catch (Exception ex) {
+                return new FailureResult {
+                    FileName = fileName,
+                    Error = ex.Message
+                };
+            }
         }
 
-        private Func<string, string> ToRelativePath(string relativeBaseDir, string absoluteBaseDir) =>
-            (string path) => Path.Combine(relativeBaseDir, Path.GetRelativePath(absoluteBaseDir, path));
+        private Func<string, string> ToRelativePath(string absoluteBaseDir) =>
+            (string path) => Path.GetRelativePath(absoluteBaseDir, path);
 
         private T Identity<T>(T t) => t;
 
@@ -65,8 +87,15 @@ namespace dotnet_versioninfo
         {
             results.ForEach(result => {
                 Console.WriteLine($"{result.FileName}");
-                Console.WriteLine($"\tFileVersionInfo.FileVersion:\t{result.FileVersion}");
-                Console.WriteLine($"\tFileVersionInfo.ProductVersion:\t{result.ProductVersion}");
+                switch (result) {
+                    case SuccessResult success:
+                        Console.WriteLine($"\tFileVersionInfo.FileVersion:\t{success.FileVersion}");
+                        Console.WriteLine($"\tFileVersionInfo.ProductVersion:\t{success.ProductVersion}");
+                        break;
+                    case FailureResult failure:
+                        Console.WriteLine($"\tError: {failure.Error}");
+                        break;
+                }
             });
         }
 
@@ -86,9 +115,12 @@ namespace dotnet_versioninfo
             var pattern = Pattern ?? DEFAULT_PATTERN;
             var absoluteBaseDir = Path.GetFullPath(".");
             var pathTransformer = Relative
-                ? ToRelativePath(".", absoluteBaseDir)
+                ? ToRelativePath(absoluteBaseDir)
                 : Identity;
-            var results = Glob.Expand(pattern)
+            var glob = new Glob(pattern) { ErrorLog = Console.WriteLine };
+            var results = glob
+                .Expand()
+                .Cast<FileInfoBase>()
                 .Select(fileInfo => fileInfo.FullName)
                 .Select(pathTransformer)
                 .Select(ProcessFile)
