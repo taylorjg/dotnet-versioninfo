@@ -1,5 +1,6 @@
 using McMaster.Extensions.CommandLineUtils;
 using System;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Reflection;
 
@@ -34,7 +35,9 @@ namespace DotNetVersionInfo
                     ShowToolVersion();
                 }
                 else {
-                    var results = Domain.ProcessFiles(Pattern ?? DEFAULT_PATTERN, Relative).ToList();
+                    var fileSystem = new FileSystem();
+                    var domain = new Domain(fileSystem);
+                    var results = domain.ProcessFiles(Pattern ?? DEFAULT_PATTERN, Relative).ToList();
                     if (Json)
                         Output.WriteJsonResults(results);
                     else

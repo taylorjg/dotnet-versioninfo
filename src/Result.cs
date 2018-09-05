@@ -3,13 +3,13 @@ using Newtonsoft.Json;
 
 namespace DotNetVersionInfo
 {
-    abstract class Result
+    public abstract class Result
     {
         [JsonProperty(Order = 1)]
         public string FileName { get; set; }
     }
 
-    class SuccessResult : Result
+    public class SuccessResult : Result
     {
         [JsonProperty(Order = 2)]
         public string FileVersion { get; set; }
@@ -17,7 +17,7 @@ namespace DotNetVersionInfo
         public string ProductVersion { get; set; }
     }
 
-    class FailureResult : Result
+    public class FailureResult : Result
     {
         [JsonProperty(Order = 2)]
         public string Error { get; set; }

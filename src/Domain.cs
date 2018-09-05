@@ -9,15 +9,25 @@ using System.Linq;
 
 namespace DotNetVersionInfo
 {
-    static class Domain
+    public class Domain
     {
-        public static IEnumerable<Result> ProcessFiles(string globPattern, bool showRelativePaths) 
+        private readonly IFileSystem _fileSystem;
+
+        public Domain(IFileSystem filesystem)
+        {
+            _fileSystem = filesystem;
+        }
+
+        public IEnumerable<Result> ProcessFiles(
+            string globPattern,
+            bool showRelativePaths) 
         {
             var absoluteBaseDir = Path.GetFullPath(".");
             var pathTransformer = showRelativePaths
                 ? ToRelativePath(absoluteBaseDir)
                 : Identity;
-            var glob = new Glob(globPattern) { ErrorLog = Console.WriteLine };
+            // var glob = new Glob(globPattern, _fileSystem) { ErrorLog = Console.WriteLine };
+            var glob = new Glob(globPattern, _fileSystem) { ErrorLog = Console.WriteLine, ThrowOnError = true };
             return glob
                 .Expand()
                 .Cast<FileInfoBase>()
@@ -27,7 +37,7 @@ namespace DotNetVersionInfo
                 .ToList();
         }
 
-        private static Result ProcessFile(string fileName)
+        private Result ProcessFile(string fileName)
         {
             try {
                 var fvi = FileVersionInfo.GetVersionInfo(fileName);
@@ -45,9 +55,9 @@ namespace DotNetVersionInfo
             }
         }
 
-        private static Func<string, string> ToRelativePath(string absoluteBaseDir) =>
+        private Func<string, string> ToRelativePath(string absoluteBaseDir) =>
             (string path) => Path.GetRelativePath(absoluteBaseDir, path);
 
-        private static T Identity<T>(T t) => t;
+        private T Identity<T>(T t) => t;
     }
 }
