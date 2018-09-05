@@ -6,10 +6,7 @@ using System.Reflection;
 
 namespace DotNetVersionInfo
 {
-    [Command(
-        Name = "dotnet versioninfo",
-        FullName = "dotnet-versioninfo",
-        Description = "Display version information of .NET Core assemblies.")]
+    [Command(Name="versioninfo", Description = "Display version information of .NET Core assemblies.")]
     class Program
     {
         [Argument(0, Description = "Glob pattern [default: **/*.dll]")]
