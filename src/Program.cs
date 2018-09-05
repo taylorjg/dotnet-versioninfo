@@ -36,7 +36,8 @@ namespace DotNetVersionInfo
                 }
                 else {
                     var fileSystem = new FileSystem();
-                    var domain = new Domain(fileSystem);
+                    var fileVersionInfo = new FileVersionInfoImpl();
+                    var domain = new Domain(fileSystem, fileVersionInfo);
                     var results = domain.ProcessFiles(Pattern ?? DEFAULT_PATTERN, Relative).ToList();
                     if (Json)
                         Output.WriteJsonResults(results);

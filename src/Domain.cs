@@ -12,10 +12,12 @@ namespace DotNetVersionInfo
     public class Domain
     {
         private readonly IFileSystem _fileSystem;
+        private readonly IFileVersionInfo _fileVersionInfo;
 
-        public Domain(IFileSystem filesystem)
+        public Domain(IFileSystem fileSystem, IFileVersionInfo fileVersionInfo)
         {
-            _fileSystem = filesystem;
+            _fileSystem = fileSystem;
+            _fileVersionInfo = fileVersionInfo;
         }
 
         public IEnumerable<Result> ProcessFiles(
@@ -40,7 +42,7 @@ namespace DotNetVersionInfo
         private Result ProcessFile(string fileName)
         {
             try {
-                var fvi = FileVersionInfo.GetVersionInfo(fileName);
+                var fvi = _fileVersionInfo.GetVersionInfo(fileName);
                 return new SuccessResult {
                     FileName = fileName,
                     FileVersion = fvi.FileVersion,
@@ -50,7 +52,7 @@ namespace DotNetVersionInfo
             catch (Exception ex) {
                 return new FailureResult {
                     FileName = fileName,
-                    Error = ex.Message
+                    Error = $"{ex.GetType().Name}: {ex.Message}"
                 };
             }
         }
