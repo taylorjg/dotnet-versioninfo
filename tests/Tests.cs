@@ -73,7 +73,7 @@ namespace Tests
 
             var actual = domain.ProcessFiles(FILENAME, showRelativePaths: false);
 
-            Assert.Equal(1, actual.Count());
+            Assert.Single(actual);
             var firstResult = actual.First();
             Assert.IsType<FailureResult>(firstResult);
             var failureResult = firstResult as FailureResult;

@@ -18,7 +18,7 @@ I eventually fixed the problem (briefly described [here](https://github.com/tayl
 
 As a result of this experience, I decided to write a
 [.NET Core Global Tool](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools)
-to make it easy to display version information for .NET Core assemblies.
+to make it easy to display the version information of .NET Core assemblies.
 
 ## Installation
 
@@ -148,7 +148,9 @@ $ versioninfo **/netcore**/*version*.dll -r -j
 
 # Links
 
+* [.NET Core 2.1 Global Tools](https://docs.microsoft.com/en-us/dotnet/core/tools/global-tools)
 * [.NET Core 2.1 Global Tools](https://natemcmaster.com/blog/2018/05/12/dotnet-global-tools/)
+* [A list of tools to extend the .NET Core command line (dotnet)](https://github.com/natemcmaster/dotnet-tools)
 * [Creating a .NET Core global CLI tool for squashing images with the TinyPNG API](https://andrewlock.net/creating-a-net-core-global-cli-tool-for-squashing-images-with-the-tinypng-api/)
 * [Version vs VersionSuffix vs PackageVersion: What do they all mean?](https://andrewlock.net/version-vs-versionsuffix-vs-packageversion-what-do-they-all-mean/)
 * [CommandLineUtils](https://natemcmaster.github.io/CommandLineUtils/)
