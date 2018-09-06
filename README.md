@@ -1,3 +1,6 @@
+
+[![NuGet](https://img.shields.io/nuget/v/dotnet-versioninfo.svg)](https://www.nuget.org/packages/dotnet-versioninfo/)
+
 ## Description
 
 A while back, I encountered the following error whilst developing a little F# app on `.NET Core` / `macOS`:
