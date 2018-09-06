@@ -22,8 +22,6 @@ to make it easy to display the version information of .NET Core assemblies.
 
 ## Installation
 
-*NOTE: THIS TOOL HAS NOT BEEN NOT RELEASED YET*
-
 ```
 dotnet tool install --global dotnet-versioninfo
 ```
