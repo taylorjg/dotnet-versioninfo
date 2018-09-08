@@ -67,7 +67,7 @@ namespace Tests
             });
             var fileVersionInfo = new MockFileVersionInfo(new MockFileVersionInfoDict
             {
-                {FILENAME, _ => throw new System.UnauthorizedAccessException()}
+                {FILENAME, _ => throw new UnauthorizedAccessException()}
             });
             var domain = new Domain(fileSystem, fileVersionInfo);
 
