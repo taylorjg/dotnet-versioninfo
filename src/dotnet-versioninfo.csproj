@@ -16,8 +16,8 @@
 
   <ItemGroup>
     <PackageReference Include="Glob.cs" Version="5.1.*" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.0.*" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.*" />
   </ItemGroup>
 
 </Project>
