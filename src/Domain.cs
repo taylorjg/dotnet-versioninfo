@@ -29,7 +29,11 @@ namespace DotNetVersionInfo
             var pathTransformer = showRelativePaths
                 ? ToRelativePath(absoluteBaseDir)
                 : Identity;
-            var glob = new Glob(globPattern, _fileSystem) { ErrorLog = HandeGlobError };
+            var glob = new Glob(
+                globPattern,
+                new GlobOptions { ErrorLog = HandeGlobError },
+                _fileSystem
+            );
             return glob
                 .Expand()
                 .Cast<FileInfoBase>()
