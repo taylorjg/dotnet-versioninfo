@@ -10,7 +10,7 @@
     <Authors>Jonathan Taylor</Authors>
     <PackageTags>.NET Core Global Tool</PackageTags>
     <PackageProjectUrl>https://github.com/taylorjg/dotnet-versioninfo</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/taylorjg/dotnet-versioninfo/blob/master/license.txt</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/taylorjg/dotnet-versioninfo.git</RepositoryUrl>
   </PropertyGroup>
 
